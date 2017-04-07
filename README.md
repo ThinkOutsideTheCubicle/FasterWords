@@ -12,7 +12,7 @@ If you wish you can help supporting that project by giving feedback, report issu
 
 We hope you will enjoy!
 ```
-[![Path of Mine](https://img.shields.io/badge/FastWords-screens-blue.svg?style=plastic)](https://www.dropbox.com/sh/rvro5c28kmyz8eq/AAA-0GF4GTXsnscPkOSWjWN1a)
+[![Path of Mine](https://img.shields.io/badge/FastWords-screens-blue.svg?style=plastic)](https://www.dropbox.com/sh/k8jbahgsmogvapi/AAAq_aB0gai74pJK_rLsC1yta)
 [![Path of Mine](https://img.shields.io/badge/FastWords-FAQ/wiki-blue.svg?style=plastic)](https://github.com/ThinkOutsideTheCubicle/FastWords/wiki/Frequently-Asked-Questions-(FAQ))
 
 ## Background
