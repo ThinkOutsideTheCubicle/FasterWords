@@ -1,0 +1,6 @@
+--> v 0.0.2-pre-alpha-unstable
+- multilanguage support via own class
+- minor bugfixes
+
+--> v 0.0.1-pre-alpha-unstable
+- first release
