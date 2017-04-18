@@ -1,8 +1,11 @@
 --> v 0.0.3-pre-alpha-unstable
-- added an intuitive load/save routine
+- added an intuitive load/save routine (the game will create a settings.cfg in the root folder)
 - categories, screen settings, language settings are automaticly saved on close and loaded on start now!
 - (might add manual loading/saving later)
 - fixed some typo's (doh!)
+known issues:
+- changelog is not yet delivered but is still available online (your reading it right now :D)
+- windows releases might be buggy while screen positioning on load (will be fixed in later releases)
 - multiplayer is probably the next big thing upcoming! (sorry didn't had time yet :P)
 
 --> v 0.0.2-pre-alpha-unstable
