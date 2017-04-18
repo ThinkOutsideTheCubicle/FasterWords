@@ -1,3 +1,10 @@
+--> v 0.0.3-pre-alpha-unstable
+- added an intuitive load/save routine
+- categories, screen settings, language settings are automaticly saved on close and loaded on start now!
+- (might add manual loading/saving later)
+- fixed some typo's (doh!)
+- multiplayer is probably the next big thing upcoming! (sorry didn't had time yet :P)
+
 --> v 0.0.2-pre-alpha-unstable
 - multilanguage support via own class
 - minor bugfixes

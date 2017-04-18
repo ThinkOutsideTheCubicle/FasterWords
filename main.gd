@@ -5,16 +5,28 @@ var myVersion = {
 	name		= Globals.get("application/name"),
 	major		= 0, 
 	minor		= 0,
-	patch		= 2,
+	patch		= 3,
 	status		= "pre-alpha",
 	revision	= "unstable",
 	url			= "https://github.com/ThinkOutsideTheCubicle/FastWords/"
 }
 
+var settings = {
+	path				= "res://settings.cfg",
+	autoSave			= false,
+	autoLoad			= false,
+	language			= [],
+	screen				= [],
+	fullscreen			= false,
+	screenID			= 0,
+	logEnabled			= true,
+	customCategorys		= []
+}
+
 var shownPopups = []
 var a2zArray = []
 
-# each category -> name | hidden | deletable | shown-id (from left to right, 0 is first) --> ["Stadt", true, false, 0]
+# each category -> title | hidden | deletable | shown-id (from left to right, 0 is first) --> ["Stadt", true, false, 0]
 var categorys = [["", false, false, 0], ["", false, false, 1], ["", false, false, 2]]
 var showncategorys = []
 
@@ -26,12 +38,12 @@ var catTreeNode
 var catTreeRoot
 var catTreeItems = []
 
-var mainRect
 var resizing = false
 var currentLog = ""
-var logEnabled = true
 var icons = [load("res://tex/del.png"), load("res://tex/off.png"), load("res://tex/on.png")]
 var logNode
+var logWidth
+var currPos
 
 func _ready():
 	init()
@@ -42,15 +54,21 @@ func init():
 	logNode = get_node("logPanel/log")
 	get_node("logPanel/log").set_scroll_follow(true)
 	
+	logWidth = get_node("logPanel").get_size().width
+	writeLog("logWidth=" + str(logWidth))
+	
 	# setup nodes
 	treeNode = get_node("Tree")
+	treeNode.set_size(treeNode.get_size() + Vector2(logWidth, 0))
+	
 	catTreeNode = get_node("WindowDialog/Tree1")
 	
 	# setup main strings
+	myVersion.license = myVersion.url + "blob/master/LICENSE"
+	
 	myVersion.string = myVersion.name + " v" + str(myVersion.major) + "." + str(myVersion.minor) + "." + str(myVersion.patch) + " " + myVersion.status + " (" + myVersion.revision + ")"
 	writeLog(myVersion.string + " using Godot Version " + OS.get_engine_version().values()[2])
-	
-	myVersion.license = myVersion.url + "blob/master/LICENSE"
+	OS.set_window_title(myVersion.string + " | " + OS.get_name())
 	
 	# loading languages
 	writeLog("loading languages")
@@ -62,8 +80,6 @@ func init():
 	# setup languages-button
 	get_node("langBtn").add_item(langNode.en.language)
 	get_node("langBtn").add_item(langNode.de.language)
-	
-	setLanguage(0)
 	
 	# loop until languages are loaded .. we maybe need it in later releases
 	"""
@@ -80,19 +96,111 @@ func init():
 		else:
 			OS.delay_msec(1000)
 	"""
+	settings.screenID = OS.get_current_screen()
+	writeLog("settings.screenID: " + str(settings.screenID))
 	
-	setupCategorys(true, null)
-	# mainFunc(0, true)
-	OS.set_window_title(myVersion.string + " | " + OS.get_name())
+	settings.fullscreen = OS.is_window_fullscreen()
 	
-	mainRect = Rect2(OS.get_window_position(), OS.get_window_size())
-	writeLog("mainRect: " + str(mainRect))
+	currPos = OS.get_screen_position(settings.screenID) + OS.get_window_position()
+	settings.screen = Rect2(currPos, OS.get_window_size())
+	writeLog("settings.screen: " + str(settings.screen))
 	
 	shownPopups = [get_node("InfoWindow").is_visible(), get_node("WindowDialog").is_visible()]
 	writeLog("shownPopups: " + str(shownPopups))
 	
-	toggleLog()
+	setLanguage(0)
+	toggleLog(settings.logEnabled)
+	
+	# loading settings
+	procSettings()
+	# toggleLog(settings.logEnabled)
+	
+	setupCategorys(true, null)
+	
 	writeLog("ready!")
+	pass
+
+func procSettings(loadfile=true):
+	# writeLog("settings.path=" + settings.path)
+	# langNode.currLang
+	# settings.language
+	
+	# settings.options.append(["language", langNode.currLang.id])
+	# settings.options.append(["id", langNode.currLang.language])
+	var configFile = ConfigFile.new()
+	
+	if (loadfile == true):
+		var err = configFile.load(settings.path)
+		writeLog("configFile.load=" + str(err))
+	
+		if (err == OK):
+			# settings.language = [langNode.currLang.id, langNode.currLang.language]
+		
+			var currSection = "Settings"
+			var readSetting = ""
+			
+			if (configFile.has_section(currSection) == true):
+				readSetting = [configFile.get_value(currSection, "langID", settings.language[0]), configFile.get_value(currSection, "language", settings.language[1])]
+				settings.language = readSetting
+				
+				if (configFile.has_section_key(currSection, "logEnabled") == true):
+					readSetting = configFile.get_value(currSection, "logEnabled", settings.logEnabled)
+					
+					if (settings.logEnabled != readSetting):
+						settings.logEnabled = readSetting
+						toggleLog(settings.logEnabled)
+					# toggleLog(settings.logEnabled)
+				
+				if (configFile.has_section_key(currSection, "screenID") == true):
+					settings.screenID = configFile.get_value(currSection, "screenID", settings.screenID)
+				
+				if (configFile.has_section_key(currSection, "screen") == true):
+					settings.screen = configFile.get_value(currSection, "screen", settings.screen)
+				
+				if (configFile.has_section_key(currSection, "fullscreen") == true):
+					settings.fullscreen = configFile.get_value(currSection, "fullscreen", settings.fullscreen)
+				
+			currSection = "CustomCategories"
+			if (configFile.has_section(currSection) == true):
+				var keyValues = configFile.get_section_keys("CustomCategories")
+				
+				for i in range(keyValues.size()):
+					readSetting = configFile.get_value(currSection, str(i))
+					setupCategorys(true, [readSetting[0], readSetting[1], readSetting[2], categorys.size()])
+	
+	writeLog("settings.language=" + str(settings.language))
+	setLanguage(settings.language[0])
+	
+	configFile.set_value("Settings", "langID", settings.language[0])
+	configFile.set_value("Settings", "language", settings.language[1])
+	
+	writeLog("settings.logEnabled=" + str(settings.logEnabled))
+	configFile.set_value("Settings", "logEnabled", settings.logEnabled)
+	
+	writeLog("settings.screenID=" + str(settings.screenID))
+	configFile.set_value("Settings", "screenID", settings.screenID)
+	OS.set_current_screen(settings.screenID)
+	
+	writeLog("settings.screen=" + str(settings.screen))
+	configFile.set_value("Settings", "screen", settings.screen)
+	OS.set_window_position(settings.screen.pos)
+	OS.set_window_size(settings.screen.size)
+	
+	writeLog("settings.fullscreen=" + str(settings.fullscreen))
+	configFile.set_value("Settings", "fullscreen", settings.fullscreen)
+	OS.set_window_fullscreen(settings.fullscreen)
+	
+	if (settings.customCategorys.size() > 0):
+			for i in range(settings.customCategorys.size()):
+				# title | hidden | deletable | shown-id
+				configFile.set_value("CustomCategories", str(i), settings.customCategorys[i])
+	
+	if(settings.autoSave == false):
+		configFile.save(settings.path)
+	
+	# configFile.close()
+	
+	writeLog(str(settings.keys()))
 	pass
 
 func loadTextFile(path):
@@ -106,52 +214,54 @@ func loadTextFile(path):
 
 func setLanguage(langID=0):
 	
-	if (langID == 0):
-		langNode.currLang = langNode.en
-	elif (langID == 1):
-		langNode.currLang = langNode.de
+	langNode.currLang = langNode.getLang(langID)
+	settings.language = [langNode.currLang.id, langNode.currLang.language]
 	
-	writeLog("setting language to " + langNode.currLang.language + " (id " + str(langID) + ")")
+	get_node("langBtn").clear()
+	
+	get_node("langBtn").add_item(langNode.en.language)
+	get_node("langBtn").add_item(langNode.de.language)
+	get_node("langBtn").select(langNode.currLang.id)
+	
+	writeLog("setting language to " + langNode.currLang.language + " (id " + str(langNode.currLang.id) + ")")
 	
 	categorys[0][0] = langNode.currLang.stockCat[0]
 	categorys[1][0] = langNode.currLang.stockCat[1]
 	categorys[2][0] = langNode.currLang.stockCat[2]
 	
-	print("categorys[0][1]=" + str(categorys[0][0]))
-	
 	var infoStr = "[right][url=" + myVersion.url + "]" + langNode.currLang.mainStrings[0] + "[/url] - [url=" + myVersion.url + "blob/master/LICENSE]" + langNode.currLang.mainStrings[1] + "[/url] - [url=" + myVersion.url + "releases]" + langNode.currLang.mainStrings[2] + "[/url][/right]"
 	get_node("infoLabel").set_bbcode(infoStr)
 	get_node("MenuPanel/addLine").set_text(langNode.currLang.string1)
-	# for i in range(categorys.size()):
-		
 	pass
 
-func toggleLog():
-	var newSize = treeNode.get_size()
-	var logWitdh = get_node("logPanel").get_size().width
+func toggleLog(setTo=-1):
 	
+	writeLog("setTo=" + str(setTo) + " | settings.logEnabled=" + str(settings.logEnabled))
 	var logMsg = "Log is now "
 	
-	if (logEnabled == true):
-		newSize.width += logWitdh
-		logMsg += "hidden."
-		logEnabled = false
-	elif (logEnabled == false):
-		newSize.width -= logWitdh
-		logMsg += "shown."
-		logEnabled = true
+	if (setTo != -1):
+		if (settings.logEnabled != setTo):
+			settings.logEnabled = setTo
+	else:
+		settings.logEnabled = (!settings.logEnabled)
 	
-	get_node("logBtn").set_pressed(logEnabled)
+	var newSize = treeNode.get_size()
+	
+	if (settings.logEnabled == false):
+		newSize.width += logWidth
+		logMsg += "hidden."
+	else:
+		newSize.width -= logWidth
+		logMsg += "shown."
 	
 	treeNode.set_size(newSize)
-	writeLog(logMsg)
-	# treeNode.grab_focus()
+	get_node("logBtn").set_pressed(settings.logEnabled)
+	
+	writeLog(logMsg + " | " + str(setTo) + " | " + str(settings.logEnabled))
 	pass
 
 func writeLog(message, useBB=false):
 	var addLine = "\n> "
-	
-	# logNode.newline()
 	
 	if (useBB == true):
 		logNode.append_bbcode(addLine + str(message))
@@ -173,8 +283,6 @@ func resetA2Z():
 func setupCategorys(reset, addCategory):
 	
 	if (reset):
-		# treeNode.get_children().clear()
-		# catTreeNode.get_children().clear()
 		resetA2Z()
 		treeItems.clear()
 		
@@ -192,9 +300,10 @@ func setupCategorys(reset, addCategory):
 		catTreeNode.set_hide_folding(true)
 		catTreeNode.set_column_titles_visible(true)
 		
-	# process addCategorys
+	# process addCategory
 	if (addCategory != null):
 		categorys.append(addCategory)
+		settings.customCategorys.append(addCategory)
 	
 	writeLog("categorys = " + str(categorys) + " | size = " + str(categorys.size()))
 	# get_node("Tree").set_columns(categorys.size() + 1)
@@ -248,9 +357,9 @@ func setupCategorys(reset, addCategory):
 	# get_node("Tree").set_columns(showncategorys.size() + 1)
 	pass
 
-func getRandomInt(minimal, maximal):
+func getRandomInt(minimal, maximum):
 	randomize()
-	var returnVal = randi() % maximal
+	var returnVal = randi() % maximum
 	return returnVal
 
 func getCenterPos(currentSize):
@@ -301,14 +410,8 @@ func mainFunc(id, printLog, value):
 	if (printLog):writeLog("id=" + str(id) + " | value=" + str(value))
 	
 	if (id == -1): # testing function!
-		var changelog = "" # load("res://changelog.txt")
-		
-		# var changelog = File.new()
-		# changelog.open("res://changelog.txt", File.READ)
-		# var file_string = changelog.get_as_text()
-		
-		changelog = loadTextFile("res://changelog.txt")
-		showPopup(0, changelog)
+		# procSettings(false)
+		toggleLog()
 	elif (id == 0):
 		toggleLog()
 	elif (id == 1):
@@ -383,13 +486,18 @@ func _on_Timer_timeout():
 	var primMsg = false
 	resizing = false
 	
-	var currRect = Rect2(OS.get_window_position(), OS.get_window_size())
+	settings.screenID = OS.get_current_screen()
+	currPos = OS.get_screen_position(settings.screenID) + OS.get_window_position()
+	var currRect = Rect2(currPos, OS.get_window_size())
 	
-	if (currRect.size != mainRect.size):
-		timerMsg = "currRect=" + str(currRect) + " | currRect=" + str(mainRect)
+	if (currRect.pos != settings.screen.pos):
+		settings.screen.pos = currRect.pos
+	
+	if (currRect.size != settings.screen.size):
+		timerMsg = "currRect=" + str(currRect) + " | settings.screen=" + str(settings.screen)
 		resizing = true
-		mainRect = currRect
-		# mainRect = Rect2(OS.get_window_position(), OS.get_window_size())
+		settings.screen.size = currRect.size
+		# settings.screen = Rect2(OS.get_window_position(), OS.get_window_size())
 	
 	if (resizing == true):
 		primMsg = true
@@ -398,11 +506,10 @@ func _on_Timer_timeout():
 			if (shownPopups[i] == true):
 				timerMsg += "i=" + str(i) + " | " + str(shownPopups[i])
 				setPopupPos(i)
-		
-		if (mainRect.size.width < 800):
-			OS.set_window_size(Vector2(800, mainRect.size.height))
-		if (mainRect.size.height < 600):
-			OS.set_window_size(Vector2(mainRect.size.width, 600))
+		if (settings.screen.size.width < 800):
+			OS.set_window_size(Vector2(800, settings.screen.size.height))
+		if (settings.screen.size.height < 600):
+			OS.set_window_size(Vector2(settings.screen.size.width, 600))
 	
 	if (primMsg == true):writeLog(timerMsg)
 	
@@ -430,7 +537,18 @@ func _on_Tree1_button_pressed(item, column, id):
 	if (column == 1):
 		categorys[id][1] = !categorys[id][1]
 	elif (column == 2):
+		
 		categorys.remove(id)
+		
+		if (categorys.size() >= 3):
+			for i in range(categorys.size()):
+				categorys[i][3] = i
+		
+		settings.customCategorys.remove(id - 3)
+		
+		if (settings.customCategorys.size() > 0):
+			for i in range(settings.customCategorys.size()):
+				settings.customCategorys[i][3] = (i + 3)
 	
 	setupCategorys(true, null)
 	
@@ -442,4 +560,8 @@ func _on_log_meta_clicked( meta ):
 
 func _on_infoLabel_meta_clicked( meta ):
 	OS.shell_open(meta)
+	pass
+
+func _on_main_exit_tree():
+	procSettings(false)
 	pass

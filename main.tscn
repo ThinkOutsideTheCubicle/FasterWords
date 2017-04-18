@@ -261,10 +261,9 @@ margin/bottom = 80.0
 toggle_mode = true
 enabled_focus_mode = 0
 shortcut = null
-text = "English"
 flat = false
 align = 0
-selected = 0
+selected = -1
 items = [  ]
 script/script = ExtResource( 2 )
 
@@ -291,20 +290,23 @@ script/script = ExtResource( 2 )
 
 [node name="testBtn" type="Button" parent="."]
 
+visibility/visible = false
 focus/ignore_mouse = false
 focus/stop_mouse = true
 size_flags/horizontal = 2
 size_flags/vertical = 2
-margin/left = 10.0
-margin/top = -30.0
-margin/right = 103.0
-margin/bottom = -10.0
+margin/left = 230.0
+margin/top = 10.0
+margin/right = 323.0
+margin/bottom = 30.0
 toggle_mode = false
 enabled_focus_mode = 0
 shortcut = null
 text = "test"
 flat = false
 script/script = ExtResource( 2 )
+
+[connection signal="exit_tree" from="." to="." method="_on_main_exit_tree"]
 
 [connection signal="pressed" from="MenuPanel/catOptionBtn" to="MenuPanel/catOptionBtn" method="_on_catOptionBtn_pressed"]
 
@@ -331,8 +333,6 @@ script/script = ExtResource( 2 )
 [connection signal="pressed" from="InfoWindow/OKBtn" to="InfoWindow/OKBtn" method="_on_OKBtn_pressed"]
 
 [connection signal="item_selected" from="langBtn" to="langBtn" method="_on_langBtn_item_selected"]
-
-[connection signal="pressed" from="langBtn" to="langBtn" method="_on_langBtn_pressed"]
 
 [connection signal="pressed" from="logBtn" to="logBtn" method="_on_logBtn_pressed"]
 
