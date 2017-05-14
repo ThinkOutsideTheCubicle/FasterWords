@@ -1,4 +1,4 @@
-## FastWords
+## FasterWords
 ```
 This repository contains software wich is a project of a currently developed game.
 	
@@ -18,8 +18,8 @@ We hope you will enjoy!
 - [ ] multiplayer/network functionality including chat/lobby/etc
 - [X] moah coffee!!!
 
-[![Path of Mine](https://img.shields.io/badge/FastWords-screens-blue.svg?style=plastic)](https://www.dropbox.com/sh/k8jbahgsmogvapi/AAAq_aB0gai74pJK_rLsC1yta)
-[![Path of Mine](https://img.shields.io/badge/FastWords-FAQ/wiki-blue.svg?style=plastic)](https://github.com/ThinkOutsideTheCubicle/FastWords/wiki/Frequently-Asked-Questions-(FAQ))
+[![FasterWords](https://img.shields.io/badge/FasterWords-screens-blue.svg?style=plastic)](https://www.dropbox.com/sh/k8jbahgsmogvapi/AAAq_aB0gai74pJK_rLsC1yta)
+[![FasterWords](https://img.shields.io/badge/FasterWords-FAQ/wiki-blue.svg?style=plastic)](https://github.com/ThinkOutsideTheCubicle/FasterWords/wiki/Frequently-Asked-Questions-(FAQ))
 
 ## Background
 Thanks to the very lightweight Game-Engine named "Godot" FastWords has been created. (link below)
