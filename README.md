@@ -14,15 +14,16 @@ We hope you will enjoy!
 ```
 
 ## To-Do
-- [ ] regulary sorted game options including a fancy HUD/Game design
-- [ ] multiplayer/network functionality including chat/lobby/etc
+- [ ] rounding up stable release (most likely 0.0.4)
+- [X] regulary sorted game options including a fancy HUD/Game design
+- [X] multiplayer/network functionality including chat/lobby/etc
 - [X] moah coffee!!!
 
 [![FasterWords](https://img.shields.io/badge/FasterWords-screens-blue.svg?style=plastic)](https://www.dropbox.com/sh/k8jbahgsmogvapi/AAAq_aB0gai74pJK_rLsC1yta)
 [![FasterWords](https://img.shields.io/badge/FasterWords-FAQ/wiki-blue.svg?style=plastic)](https://github.com/ThinkOutsideTheCubicle/FasterWords/wiki/Frequently-Asked-Questions-(FAQ))
 
 ## Background
-Thanks to the very lightweight Game-Engine named "Godot" FastWords has been created. (link below)
+Thanks to the very lightweight Game-Engine named "Godot" FasterWords has been created. (link below)
 
 [![Godot Engine](https://img.shields.io/badge/GodotEngine-GithHub-blue.svg?style=plastic)](https://github.com/godotengine)
 [![Godot Engine](https://img.shields.io/badge/GodotEngine-website-blue.svg?style=plastic)](http://www.godotengine.org/)
