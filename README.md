@@ -13,8 +13,10 @@ If you wish you can help supporting that project by giving feedback, report issu
 We hope you will enjoy!
 ```
 
-## To-Do
-- [ ] rounding up stable release (most likely 0.0.4)
+## To-Do (v0.0.4-stable)
+- [ ] rounding up stable release
+- [ ] repo restructure for easier overview (most likely happens when finnishing v0.0.4-stable)
+- [X] voting system for several occasions
 - [X] regulary sorted game options including a fancy HUD/Game design
 - [X] multiplayer/network functionality including chat/lobby/etc
 - [X] moah coffee!!!
